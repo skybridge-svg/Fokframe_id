@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Fokframe Photography</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Poppins,sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("https://images.unsplash.com/photo-1492724441997-5dc865305da7");
+  background-size:cover;
+  background-position:center;
+  min-height:100vh;
+  color:#fff;
+}
+
+header{
+  text-align:center;
+  padding:40px 20px;
+}
+header h1{
+  font-size:2.8rem;
+  margin:0;
+  letter-spacing:2px;
+}
+header p{opacity:.9}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+  padding:25px;
+  max-width:1200px;
+  margin:auto;
+}
+
+.card{
+  background:#fff;
+  color:#222;
+  border-radius:20px;
+  padding:22px;
+  text-align:center;
+  box-shadow:0 15px 35px rgba(0,0,0,.35);
+  transition:.3s;
+}
+.card:hover{transform:translateY(-6px)}
+
+.price{
+  font-weight:700;
+  margin:10px 0 18px;
+  color:#c62828;
+}
+
+.btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:30px;
+  background:#111;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn:hover{background:#333}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal.active{display:flex}
+
+.modal-box{
+  background:#fff;
+  color:#222;
+  width:92%;
+  max-width:430px;
+  padding:28px;
+  border-radius:22px;
+}
+
+.modal-box h3{
+  text-align:center;
+  margin-top:0;
+}
+
+input,select{
+  width:100%;
+  padding:11px;
+  margin-bottom:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+}
+
+.qris{
+  text-align:center;
+  margin:15px 0;
+  display:none;
+}
+.qris img{
+  width:220px;
+  border-radius:14px;
+}
+
+.upload{
+  background:#f5f5f5;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:15px;
+  font-size:.9rem;
+}
+
+.whatsapp{
+  background:#25D366;
+}
+.whatsapp:hover{background:#1ebe5d}
+
+.note{
+  font-size:.85rem;
+  opacity:.8;
+  text-align:center;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>FOKFRAME</h1>
+  <p>Bingkai Kenangan, Abadikan Momen</p>
+</header>
+
+<section class="products" id="products"></section>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="productTitle"></h3>
+
+    <input id="name" placeholder="Nama Lengkap">
+    <input id="email" placeholder="Email">
+
+    <select id="pay">
+      <option value="">Pilih Metode Pembayaran</option>
+      <option value="QRIS">QRIS</option>
+      <option value="BCA">BCA</option>
+      <option value="BNI">BNI</option>
+      <option value="DANA">DANA</option>
+    </select>
+
+    <!-- QRIS -->
+    <div class="qris" id="qrisBox">
+      <p><b>Scan QRIS di bawah ini</b></p>
+      <img src="qris.png" alt="QRIS Fokframe">
+    </div>
+
+    <!-- Upload -->
+    <div class="upload">
+      <b>Upload Bukti Transfer</b><br>
+      <input type="file" id="proof" accept="image/*">
+    </div>
+
+    <button class="btn whatsapp" onclick="sendWA()">
+      Kirim & Konfirmasi via WhatsApp
+    </button>
+
+    <div class="note">
+      Anda akan diarahkan ke WhatsApp Admin
+    </div>
+  </div>
+</div>
+
+<script>
+const waNumber = "6287796371450";
+
+const products = [
+ {n:"Fokframe Sunset",p:250000},
+ {n:"Fokframe Urban",p:300000},
+ {n:"Fokframe Nature",p:280000},
+ {n:"Fokframe Wedding",p:450000}
+];
+
+let product="",price=0;
+
+const list=document.getElementById("products");
+products.forEach(i=>{
+ list.innerHTML+=`
+ <div class="card">
+   <h3>${i.n}</h3>
+   <div class="price">Rp ${i.p.toLocaleString()}</div>
+   <button class="btn" onclick="order('${i.n}',${i.p})">
+     Pesan Sekarang
+   </button>
+ </div>`;
+});
+
+function order(n,p){
+ product=n; price=p;
+ document.getElementById("productTitle").innerText=n;
+ document.getElementById("modal").classList.add("active");
+}
+
+document.getElementById("pay").addEventListener("change",function(){
+ document.getElementById("qrisBox").style.display =
+   this.value==="QRIS" ? "block":"none";
+});
+
+function sendWA(){
+ const name=document.getElementById("name").value;
+ const pay=document.getElementById("pay").value;
+ const proof=document.getElementById("proof").files.length;
+
+ if(!name||!pay||!proof){
+   alert("Lengkapi data & upload bukti transfer");
+   return;
+ }
+
+ const msg=encodeURIComponent(
+`Halo Admin Fokframe 👋
+
+Saya sudah melakukan pembayaran.
+
+Nama: ${name}
+Produk: ${product}
+Harga: Rp ${price.toLocaleString()}
+Metode: ${pay}
+
+Bukti transfer saya kirim setelah ini 🙏`
+ );
+
+ window.open(
+   `https://api.whatsapp.com/send?phone=${waNumber}&text=${msg}`,
+   "_blank"
+ );
+}
+</script>
+
+</body>
+</html>
